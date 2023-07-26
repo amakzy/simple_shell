@@ -25,6 +25,7 @@ struct command
 void changeDirectory(char **args);
 void printEnvVariables(void);
 void exitShell(char **args);
+extern char **environ;
 
 /*Execute and run commands*/
 int executeCommand(struct command *cmd);
