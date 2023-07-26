@@ -35,4 +35,3 @@ and more.
 ## Contributors
 
 Ahmad Muhammad.
-Gerald Enyenwa.

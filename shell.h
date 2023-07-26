@@ -4,76 +4,43 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <sys/stat.h>
 #include <unistd.h>
-#include <errno.h>
-#include <dirent.h>
-#include <signal.h>
-#include <stddef.h>
+#include <sys/wait.h>
 
-/*constants*/
-#define EXTERNAL_COMMAND 1
-#define INTERNAL_COMMAND 2
-#define PATH_COMMAND 3
-#define INVALID_COMMAND -1
-
-#define min(x, y) (((x) < (y)) ? (x) : (y))
+#define MAX_INPUT_SIZE 1024
+#define MAX_TOKENS 100
 
 /**
- *struct map - a struct that maps a command name to a function 
- *
- *@command_name: name of the command
- *@func: the function that executes the command
+ *struct command - a struct that maps a command name to a function
+ * @name: name of the command
+ * @args: the function that executes the command
  */
-
-typedef struct map
+struct command
 {
-	char *command_name;
-	void (*func)(char **command);
-} function_map;
+	char *name;
+	char **args;
+};
 
-extern char **environ;
-extern char *line;
-extern char **commands;
-extern char *shell_name;
-extern int status;
+/* Built-in command functions*/
+void changeDirectory(char **args);
+void printEnvVariables(void);
+void exitShell(char **args);
 
-/*helpers*/
-void print(char *, int);
-char **tokenizer(char *, char *);
-void remove_newline(char *);
-int _strlen(char *);
-void _strcpy(char *, char *);
+/*Execute and run commands*/
+int executeCommand(struct command *cmd);
+int runExternalCommand(struct command *cmd);
+int runPipedCommands(struct command *cmd1, struct command *cmd2);
 
-/*helpers2*/
-int _strcmp(char *, char *);
-char *_strcat(char *, char *);
-size_t _strspn(char *str1, char *str2);
-size_t _strcspn(char *str1, char *str2);
-char *_strchr(char *s, int c);
+/* Read a command from input */
+struct command *readCommand(void);
 
-/*helpers3*/
-char *_strtok_r(char *, char *, char **);
-int _atoi(char *);
-void *_realloc(void *ptr, unsigned int old_size, unsigned int new_size);
-void ctrl_c_handler(int);
-void remove_comment(char *);
+/* Tokenize a string into arguments */
+char **tokenize(char *line);
 
-/*utils*/
-int parse_command(char *);
-void execute_command(char **, int);
-char *check_path(char *);
-void (*get_func(char *))(char **);
-char *_getenv(char *);
+/*Parse a command string into a struct*/
+struct command *parseCommand(char *input);
 
-/*built_in*/
-void env(char **);
-void quit(char **);
+/* Cleanup memory */
+void freeCommand(struct command *cmd);
 
-/*main*/
-extern void non_interactive(void);
-extern void initializer(char **current_command, int type_command);
-
-#endif /*SHELL_H*/
+#endif

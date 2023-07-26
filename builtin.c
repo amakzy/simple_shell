@@ -1,67 +1,51 @@
 #include "shell.h"
+#include <unistd.h>
 
 /**
- * env - prints the current environment
- * @tokenized_command: command entered
+ * changeDirectory - change current directory cd.
  *
- * Return: void
+ * @args: number of arguments passed
  */
-void env(char **tokenized_command __attribute__((unused)))
+void changeDirectory(char **args)
 {
-	int i = 0;
-
-	while (environ[i] != NULL)
+	if (args[1] == NULL)
 	{
-		print(environ[i], STDOUT_FILENO);
-		print("\n", STDOUT_FILENO);
-		i++;
+		fprintf(stderr, "Expected argument to cd\n");
+	}
+	else
+	{
+		if (chdir(args[1]) != 0)
+		{
+			perror("chdir failed");
+		}
 	}
 }
 
 /**
- * quit - exits the shell
- * @tokenized_command: command entered
- *
- * Return: void
+ * printEnvVariables - print environment variables for the shell.
  */
-void quit(char **tokenized_command)
+void printEnvVariables(void)
 {
-	int num_token = 0;
-	int arg;
+	extern char **environ;
 
-	while (tokenized_command[num_token] != NULL)
-		num_token++;
+	int i;
 
-	switch (num_token)
+	for (i = 0; environ[i] != NULL; i++)
 	{
-		case 1:
-			free(tokenized_command);
-			free(line);
-			free(commands);
-			exit(status);
-			break;
-
-		case 2:
-			arg = _atoi(tokenized_command[1]);
-
-			if (arg == -1)
-			{
-				print(shell_name, STDERR_FILENO);
-				print(": 1: exit: Illegal number: ", STDERR_FILENO);
-				print(tokenized_command[1], STDERR_FILENO);
-				print("\n", STDERR_FILENO);
-				status = 2;
-			}
-			else
-			{
-				free(line);
-				free(tokenized_command);
-				free(commands);
-				exit(arg);
-			}
-			break;
-		default:
-			print("$: exit doesn't take more than one argument\n", STDERR_FILENO);
-			break;
+		printf("%s\n", environ[i]);
 	}
+}
+
+/**
+ * exitShell - exit the shell.
+ *
+ * @args: number of arguments passed
+*/
+void exitShell(char **args)
+{
+	if (args[1] != NULL)
+	{
+		exit(atoi(args[1]));
+	}
+	exit(0);
 }
