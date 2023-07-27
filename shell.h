@@ -52,4 +52,6 @@ char *getEnvVar(const char *name);
 void setEnvVar(const char *name, const char *value);
 void unsetEnvVar(const char *name);
 int asprintf(char **strp, const char *fmt, ...);
+char *findExecutable(char *command);
+
 #endif

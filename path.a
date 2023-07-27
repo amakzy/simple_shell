@@ -1,0 +1,65 @@
+#include "shell.h"
+
+/**
+ * execute - Function to execute command
+ * @command: the path command
+ */
+void execute(char *command)
+{
+
+  /* Tokenize the command*/
+	char *token = strtok(command, " ");
+	char *args[100];
+	int i = 0;
+
+	while (token != NULL)
+	{
+		args[i++] = token;
+		token = strtok(NULL, " ");
+	}
+	args[i] = NULL;
+
+  /* Loop through PATH directories */
+	char *path = getenv("PATH");
+	char *dir;
+	char exe[1024];
+	int found = 0;
+
+	dir = strtok(path, ":");
+
+	while (dir != NULL)
+	{
+		snprintf(exe, sizeof(exe), "%s/%s",
+				dir, args[0]);
+		if (access(exe, X_OK) == 0)
+		{
+			found = 1;
+
+			break;
+		}
+		dir = strtok(NULL, ":");
+	}
+
+	if (!found)
+	{
+		printf("%s not found in PATH\n",
+				args[0]);
+		return;
+	}
+
+	/* Fork and execute*/
+
+	pid_t pid = fork();
+
+	if (pid == 0)
+	{
+		/* Child process*/
+		execve(exe, args, environ);
+	}
+	else
+	{
+    /* Parent process */
+		wait(NULL);
+	}
+
+}

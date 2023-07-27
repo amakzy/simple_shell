@@ -83,6 +83,33 @@ int main(void)
 }
 
 /**
+ * findExecutable - to find the exe
+ * @command: the variable
+ * Return: exe.
+ */
+char *findExecutable(char *command)
+{
+	char *path = getenv("PATH");
+	char *dir;
+	char *exe = NULL;
+
+	dir = strtok(path, ":");
+	while (dir != NULL)
+	{
+		exe = strcat(dir, "/");
+		exe = strcat(exe, command);
+
+		if (access(exe, X_OK) == 0)
+		{
+			return (exe);
+		}
+		dir = strtok(NULL, ":");
+	}
+
+	return (exe);
+}
+
+/**
  * execArgs - executes commands
  *
  * @args: parsed input argument
@@ -91,6 +118,7 @@ int main(void)
 */
 void execArgs(char **args)
 {
+	pid_t pid;
 	/* Built-in commands */
 	if (strcmp(args[0], "cd") == 0)
 	{
@@ -106,16 +134,39 @@ void execArgs(char **args)
 	}
 	else
 	{
+		/* Find the executable */
+		char *exe = findExecutable(args[0]);
+
+		/* Check if executable was found */
+		if (exe[0] == '\0')
+		{
+			printf("%s not found in PATH\n", args[0]);
+			return;
+		}
+
 		/* Fork and execute command */
-		pid_t pid = fork();
+		pid = fork();
 
 		if (pid == 0)
 		{
-			execvp(args[0], args);
-			exit(EXIT_FAILURE);
+			/* Child process */
+
+			if (execve(exe, args, environ) == -1)
+			{
+				perror("execve failed");
+				exit(EXIT_FAILURE);
+			}
 		}
-		/* Wait for child process */
-		wait(NULL);
+		else if (pid < 0)
+		{
+			/* Fork failed */
+			perror("fork failed");
+		}
+		else
+		{
+		    /* Parent process */
+			wait(NULL);
+		}
 	}
 }
 
