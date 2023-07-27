@@ -38,6 +38,17 @@ char **parseInput(char *input);
 char *readInput();
 
 /**
+ * handle_SIGINT - handle ctlr +c
+ *
+ * @signum: recive the signal
+ */
+void handle_SIGINT(int signum)
+{
+	printf("Received SIGINT signal %d\n", signum);
+	fflush(stdout);
+}
+
+/**
  * main - shell main function
  *
  * runs in a loop to accept user input, parse it, and execute commands.
@@ -47,6 +58,8 @@ int main(void)
 {
 	char *input;
 	char **args;
+
+	signal(SIGINT, handle_SIGINT);
 
 	while (1)
 	{

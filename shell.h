@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>
+#include <signal.h>
 #include <string.h>
 #include <unistd.h>
 #include <sys/wait.h>
@@ -44,6 +45,7 @@ struct command *parseCommand(char *input);
 
 /* Cleanup memory */
 void freeCommand(struct command *cmd);
+void handle_SIGINT(int signum); /* handle signal */
 
 /* environment handling */
 char *getEnvVar(const char *name);
