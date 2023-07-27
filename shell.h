@@ -2,6 +2,7 @@
 #define SHELL_H
 
 #include <stdio.h>
+#include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -44,4 +45,9 @@ struct command *parseCommand(char *input);
 /* Cleanup memory */
 void freeCommand(struct command *cmd);
 
+/* environment handling */
+char *getEnvVar(const char *name);
+void setEnvVar(const char *name, const char *value);
+void unsetEnvVar(const char *name);
+int asprintf(char **strp, const char *fmt, ...);
 #endif
