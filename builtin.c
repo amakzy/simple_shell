@@ -8,9 +8,28 @@
  */
 void changeDirectory(char **args)
 {
+	char cwd[1024];
+
 	if (args[1] == NULL)
 	{
-		fprintf(stderr, "Expected argument to cd\n");
+		/* cd with no arguments - go home */
+		char *home = getenv("HOME");
+
+		if (home == NULL)
+		{
+			fprintf(stderr, "HOME not set\n");
+		}
+		else if (chdir(home) != 0)
+		{
+			perror("chdir failed");
+		}
+	} else if (strcmp(args[1], "-") == 0)
+	{
+		/* cd - */
+		if (chdir(getenv("OLDPWD")) != 0)
+		{
+			perror("chdir failed");
+		}
 	}
 	else
 	{
@@ -18,6 +37,16 @@ void changeDirectory(char **args)
 		{
 			perror("chdir failed");
 		}
+	}
+	 /* Update PWD environment variable */
+
+	if (getcwd(cwd, sizeof(cwd)) != NULL)
+	{
+		setenv("PWD", cwd, 1);
+	}
+	else
+	{
+		perror("getcwd failed");
 	}
 }
 
